@@ -16,8 +16,17 @@ def process_speeches(speech_arr):
 
 if __name__ == '__main__':
     train_speeches = eval(open('data/train', 'r').read())
+    dev_speeches = eval(open('data/dev', 'r').read())
+    test_speeches = eval(open('data/test', 'r').read())
     
     proc_train_speeches = process_speeches(train_speeches)
+    proc_dev_speeches = process_speeches(dev_speeches)
+    proc_test_speeches = process_speeches(test_speeches)
 
-    print('unproc: ' + str(train_speeches[0]))
-    print('proc: ' + str(proc_train_speeches[0]))
+    proc_train = open('data/proc_train' 'w')
+    proc_dev = open('data/proc_dev', 'w')
+    proc_test = open('data/proc_test', 'w')
+
+    proc_train.write(str(proc_train_speeches))
+    proc_train.write(str(proc_dev_speeches))
+    proc_train.write(str(proc_test_speeches))
