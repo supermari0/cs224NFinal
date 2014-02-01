@@ -1,0 +1,43 @@
+lect 2
+- noisy channel model for statistical MT
+lect 3
+- EM algorithm for word alignment
+    - 5 IBM models -- can use this stuff as features
+- evaluation
+    - BLEU metric
+lect 4/5
+- phrase-based translation
+- syntax-based MT, parse trees
+- language model - use probabilistic stuff, more useful than categorical model
+  of syntax
+    * use in text classification
+- assign scores to language -- P("I saw the cat") > P("cat saw the I")
+- 3 components of generalization to deal with infinity of language
+    - decomposition
+    - discounting - save P mass for unseen possibilities
+    - backoff from context of words to equivalence classes that generalize
+      better
+- decomposition - ngram model, markov assumption
+    - Shannon tried to understand the entropy of English on character level
+- discounting/backoff/interpolation
+* topical language models -- can have a model for Shakespearian English*
+lect 6
+- 2 views of linguistic structure
+    - phase structure/constituency -- see slides for details, potentially
+      useful feature
+    - dependency structure
+- annotated data -> Penn treebank
+lect 9
+- dependency grammar
+    - dependencies can be typed, usually form a tree
+    - head rules can be used to extract dependency from CFG parse
+    - see srcs. of information for dependency parse
+    - see slide for cubic parsing -- interesting, but not needed
+    ... many algorithms for parsing, MST one looks cool
+lect 10
+- coref resolution
+    - identify mentions that refer to same entity
+    - not really applicable to classification?
+    - see features for feature ideas
+lect 11 * Feature-based linear classifiers
+

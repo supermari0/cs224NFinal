@@ -1,0 +1,12 @@
+TODO
+- decide on classification algorithms and feature sets
+    - implement algorithms -- look into nltk, ML libs from 229, stuff from
+      cs124
+- decide on evaluation framework - see classification literature, cs229
+    - probably just simple precision/recall/accuracy/f1
+
+- after done with Shakespeare, try to eval author gender.
+- after that, try to classify modern texts; then, train on modern texts and
+  test on Shakespeare
+
+- ask if you can do week 10 quiz
