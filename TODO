@@ -1,9 +1,16 @@
 TODO
-- decide on classification algorithms and feature sets
-    - implement algorithms -- look into nltk, ML libs from 229, stuff from
-      cs124
+
+- preprocess
+    - get count of words, most n common words
+
 - decide on evaluation framework - see classification literature, cs229
     - probably just simple precision/recall/accuracy/f1
+
+- maxent
+    - add features incrementally
+
+- svm
+    - research, decide on new feature set
 
 - after done with Shakespeare, try to eval author gender.
 - after that, try to classify modern texts; then, train on modern texts and
