@@ -9,4 +9,6 @@ TODO
 - after that, try to classify modern texts; then, train on modern texts and
   test on Shakespeare
 
+- dockerify for easy running - see README.md for what to do
+
 - ask if you can do week 10 quiz
