@@ -1,5 +1,5 @@
+import math
 import nltk
-import nltk.classify.maxent as maxent
 import pickle
 
 TRAIN_DATA_FILE = 'data/proc_train'
@@ -14,7 +14,7 @@ def common_token_feature_dict(common_tokens_dict, token_tuples):
     are initialized to 0. token_tuples is a list of (token, part-of-speech)
     tuples. The function returns a dictionary whose keys are the keys of
     common_tokens_dict and whose values are the frequency of occurrence of the
-    key token in the text. """
+    key token in the text (1 + ln(count/n_tokens) if count != 0, 0 otherwise). """
 
     for (token, pos) in token_tuples:
         if token in common_tokens_dict:
@@ -22,7 +22,8 @@ def common_token_feature_dict(common_tokens_dict, token_tuples):
 
     n_tokens = len(token_tuples)
     for token, count in common_tokens_dict.items():
-        common_tokens_dict[token] = count / float(n_tokens)
+        if count != 0:
+            common_tokens_dict[token] = 1 + math.log(count / float(n_tokens))
 
     return common_tokens_dict
 
@@ -47,8 +48,6 @@ def common_token_features_labeled(proc_data):
 
         features.append((common_token_feature_dict(common_tokens_dict, token_tuples),
             gender_tag))
-
-    print(len(features))
     return features
 
 def extract_labeled_features(proc_data):
@@ -68,6 +67,11 @@ def get_training_set():
 
 def classify():
     training_set = get_training_set()
+    
+    # Set algorithm to GIS because of bug in scipy (missing maxentropy module).
+    algorithm = nltk.classify.MaxentClassifier.ALGORITHMS[0]
+
+    classifier = nltk.classify.MaxentClassifier.train(training_set, algorithm)
     #TODO fix below once features are extracted
     #MaxEntClassifier = maxent.MaxentClassifier.train(...)
     
