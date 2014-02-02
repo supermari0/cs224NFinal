@@ -10,6 +10,7 @@ if __name__ == '__main__':
 
     proc_train_pickled = open('data/proc_train', 'rb')
     proc_train = pickle.load(proc_train_pickled)
+    proc_train_pickled.close()
 
     n_tokens = 0
     n_male_tokens = 0
