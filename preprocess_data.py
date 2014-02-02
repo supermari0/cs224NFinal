@@ -1,4 +1,5 @@
 import nltk
+import pickle
 
 def process_speeches(speech_arr):
     proc_speeches = []
@@ -15,18 +16,26 @@ def process_speeches(speech_arr):
     return proc_speeches
 
 if __name__ == '__main__':
+
+    print('Reading raw data...')
     train_speeches = eval(open('data/train', 'r').read())
     dev_speeches = eval(open('data/dev', 'r').read())
     test_speeches = eval(open('data/test', 'r').read())
     
+    print('Processing train speeches...')
     proc_train_speeches = process_speeches(train_speeches)
+    print('Processing dev speeches...')
     proc_dev_speeches = process_speeches(dev_speeches)
+    print('Processing test speeches...')
     proc_test_speeches = process_speeches(test_speeches)
 
-    proc_train = open('data/proc_train' 'w')
-    proc_dev = open('data/proc_dev', 'w')
-    proc_test = open('data/proc_test', 'w')
+    print('Writing processed data to disk...')
+    proc_train = open('data/proc_train', 'wb')
+    proc_dev = open('data/proc_dev', 'wb')
+    proc_test = open('data/proc_test', 'wb')
 
-    proc_train.write(str(proc_train_speeches))
-    proc_train.write(str(proc_dev_speeches))
-    proc_train.write(str(proc_test_speeches))
+    pickle.dump(proc_train_speeches, proc_train)
+    pickle.dump(proc_dev_speeches, proc_dev)
+    pickle.dump(proc_test_speeches, proc_test)
+
+    print('Processing done!')
