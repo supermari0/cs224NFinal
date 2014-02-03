@@ -1,7 +1,7 @@
 TODO
 
-- preprocess
-    - get count of words, most n common words
+- fix, comment better token_stats.py
+- add POS features with backoff
 
 - decide on evaluation framework - see classification literature, cs229
     - probably just simple precision/recall/accuracy/f1

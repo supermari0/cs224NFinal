@@ -40,8 +40,8 @@ if __name__ == '__main__':
     sorted_female = sorted(female_word_counts.iteritems(), key=operator.itemgetter(1),
         reverse=True)
 
-    print('Top 300 sorted female tokens: ')
-    print(sorted_female[:300])
+    print('Top 500 sorted female tokens: ')
+    print(sorted_female[:500])
 
     print('\n')
 
@@ -49,10 +49,8 @@ if __name__ == '__main__':
     print('Number of male tokens: ' + str(n_male_tokens))
     print('Number of female tokens: ' + str(n_female_tokens))
 
-    top_tokens = set([token for (token, count) in sorted_male[:300]] + [token for
-        (token, count) in sorted_female[:300]])
-
-    print('Top ' + str(len(top_tokens)) + ' tokens: ' + str(top_tokens))
+    top_tokens = set([token for (token, count) in sorted_male] + [token for
+        (token, count) in sorted_female])
 
     top_token_file = open('data/top_tokens', 'wb')
     pickle.dump(top_tokens, top_token_file)
