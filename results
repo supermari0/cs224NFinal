@@ -8,4 +8,19 @@
 0.598540145985 for 50 iterations with 1K bigram features only
 0.605839416058 for 75 iterations with 1K bigram features only
 0.63503649635 for 75 iterations with 1.5K bigram features only
+0.532846715328 for 75 iterations with 1.5K trigram features only
+
+
+1.5K bigram features:
+Accuracy: 0.63503649635
+Precision: 0.594202898551
+Recall: 0.650793650794
+
+1.5K bigram features + bigram POS features:
+Accuracy: 0.642335766423
+Precision: 0.623188405797
+Recall: 0.651515151515
+
+1.5K bigram features + bigram POS features + trigram POS features:
+
 - next: try binary POS trigram features. if that works, add bigram with backoff

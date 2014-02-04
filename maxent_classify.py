@@ -9,7 +9,10 @@ TEST_DATA_FILE = 'data/proc_test'
 
 COMMON_BIGRAMS_FILE = 'data/top_bigrams'
 COMMON_TOKENS_FILE = 'data/top_tokens'
+COMMON_TRIGRAMS_FILE = 'data/top_trigrams'
+
 POS_FILE = 'data/pos_set'
+POS_BIGRAMS_FILE = 'data/pos_bigrams'
 
 N_ITERATIONS = 75
 
@@ -88,6 +91,7 @@ def common_token_features(proc_data, label):
     for speech_tuple in proc_data:
         common_tokens_dict = dict.fromkeys(common_tokens_set, 0)
 
+
         token_tuples = speech_tuple[0]
 
         if label:
@@ -98,6 +102,37 @@ def common_token_features(proc_data, label):
             features.append(common_token_feature_dict(common_tokens_dict,
                 token_tuples))
     return features
+
+def pos_bigram_features(proc_data, label):
+    pos_bigrams_pickled = open(POS_BIGRAMS_FILE, 'rb')
+    pos_bigrams_set = pickle.load(pos_bigrams_pickled)
+    pos_bigrams_pickled.close()
+
+    features = []
+
+    for speech_tuple in proc_data:
+        pos_bigrams_dict = dict.fromkeys(pos_bigrams_set, 0)
+
+        token_tuples = speech_tuple[0]
+        pos_bigram_features = pos_bigram_feature_dict(pos_bigrams_dict,
+                token_tuples)
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((pos_bigram_features, gender_tag))
+        else:
+            features.append(pos_bigram_features)
+
+    return features
+
+def pos_bigram_feature_dict(pos_bigrams_dict, token_tuples):
+    for i in range(1, len(token_tuples)):
+        pos = token_tuples[i][1]
+        prev_pos = token_tuples[i-1][1]
+        pos_bigram = prev_pos + '+' + pos
+        if pos_bigram in pos_bigrams_dict:
+            pos_bigrams_dict[pos_bigram] = 1
+    return pos_bigrams_dict
 
 def common_bigram_features(proc_data, label):
     common_bigrams_pickled = open(COMMON_BIGRAMS_FILE, 'rb')
@@ -131,24 +166,54 @@ def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
 
     return common_bigrams_dict
 
+def common_trigram_features(proc_data, label):
+    common_trigrams_pickled = open(COMMON_TRIGRAMS_FILE, 'rb')
+    common_trigrams_set = pickle.load(common_trigrams_pickled)
+    common_trigrams_pickled.close()
+
+    features = []
+
+    for speech_tuple in proc_data:
+        common_trigrams_dict = dict.fromkeys(common_trigrams_set, 0)
+
+        token_tuples = speech_tuple[0]
+        trigram_features = common_trigram_feature_dict(common_trigrams_dict,
+                token_tuples)
+        
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((trigram_features, gender_tag))
+        else:
+            features.append(trigram_features)
+
+    return features
+
+def common_trigram_feature_dict(common_trigrams_dict, token_tuples):
+    for i in range(2, len(token_tuples)):
+        token = token_tuples[i][0]
+        prev_token = token_tuples[i-1][0]
+        prev2_token = token_tuples[i-2][0]
+        trigram = prev2_token + '+' + prev_token + '+' + token
+        if trigram in common_trigrams_dict:
+            common_trigrams_dict[trigram] = 1
+
+    return common_trigrams_dict
+
+
 def extract_features(proc_data, label=False):
     #features = []
     #features += pos_features(proc_data, label)
-    #common_token_feat = common_token_features(proc_data, label)
+    #common_trigram_feat = common_trigram_features(proc_data, label)
     features = common_bigram_features(proc_data, label)
+    #pos_bigram_feat = pos_bigram_features(proc_data, label)
+    #print pos_bigram_feat
     #for i in range(len(features)):
     #    if label:
-    #        features[i][0].update(common_bigram_feat[i][0])
-    #        print(features[i])
+    #        features[i][0].update(pos_bigram_feat[i][0])
+    #        print features[i]
     #    else:
-    #        features[i].update(common_bigram_feat[i])
-    #for i in range(len(features)):
-    #    if label:
-    #        for k, v in common_token_feat[i][0].items():
-    #            features[i][0][k] = v
-    #    else:
-    #        for k, v in common_token_feat[i].items():
-    #            features[i][k] = v
+    #        features[i].update(pos_bigram_feat[i])
+    #        print features[i]
     return features
 
 def extract_labels(proc_data):
@@ -170,7 +235,7 @@ def get_dev_set():
     """ Returns a tuple whose first element is the unlabeled list of feature
     dicts ready for classification and whose second element is the list of
     gold labels. """
-    dev_pickled = open(DEV_DATA_FILE, 'rb')
+    dev_pickled = open(TEST_DATA_FILE, 'rb')
     dev_proc_data = pickle.load(dev_pickled)
     dev_pickled.close()
 
@@ -189,15 +254,31 @@ def classify():
     classifier = nltk.classify.MaxentClassifier.train(training_set, algorithm,
             max_iter=N_ITERATIONS)
 
+
     dev_set = get_dev_set()
     labels = classifier.batch_classify(dev_set[0])
     print labels
 
     correct = 0
+    true_male = 0
+    true_female = 0
+    false_male = 0
+    false_female = 0
     for i in range(len(labels)):
         if labels[i] == dev_set[1][i]:
             correct += 1
-    print(float(correct)/len(labels))    
+            if labels[i] == 'M':
+                true_male += 1
+            else:
+                true_female += 1
+        else:
+            if labels[i] == 'M':
+                false_female += 1
+            else:
+                false_male += 1
+    print('Accuracy: ' + str(float(correct)/len(labels)))
+    print('Precision: ' + str(float(true_male) / (true_male + false_male)))
+    print('Recall: ' + str(float(true_male) / (true_male + false_female)))
 
 if __name__ == '__main__':
     classify()

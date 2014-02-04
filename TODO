@@ -1,5 +1,7 @@
 TODO
 
+- clean up files
+
 - add bigram features, try with and without backoff, try by itself
 - add POS features with backoff
 

@@ -9,6 +9,12 @@ if __name__ == '__main__':
 
     pos_counts = defaultdict(lambda: 0)
 
+    m_pos_bigram_counts = defaultdict(lambda: 0)
+    m_pos_trigram_counts = defaultdict(lambda: 0)
+
+    f_pos_bigram_counts = defaultdict(lambda: 0)
+    f_pos_trigram_counts = defaultdict(lambda: 0)
+
     male_bigram_counts = defaultdict(lambda: 0)
     female_bigram_counts = defaultdict(lambda: 0)
 
@@ -39,26 +45,36 @@ if __name__ == '__main__':
                 prev_token = token_tuples[i-1][0]
                 bigram = prev_token + '+' + token
 
+                prev_pos = token_tuples[i-1][1]
+                pos_bigram = prev_pos + '+' + pos
+
             if i > 1:
                 prev2_token = token_tuples[i-2][0]
                 trigram = prev2_token + '+' + prev_token + '+' + token
+
+                prev2_pos = token_tuples[i-1][1]
+                pos_trigram = prev2_pos + '+' + prev_pos + '+' + pos
 
             if gender_tag == 'M':
                 male_word_counts[token] += 1
                 n_male_tokens += 1
                 
                 if i > 0:
-                    male_bigram_counts[bigram] += 1    
+                    male_bigram_counts[bigram] += 1
+                    m_pos_bigram_counts[pos_bigram] += 1
                 if i > 1:
                     male_trigram_counts[trigram] += 1
+                    m_pos_trigram_counts[pos_trigram] += 1
             else:
                 female_word_counts[token] += 1
                 n_female_tokens += 1
 
                 if i > 0:
-                    female_bigram_counts[bigram] += 1    
+                    female_bigram_counts[bigram] += 1
+                    f_pos_bigram_counts[pos_bigram] += 1
                 if i > 1:
                     female_trigram_counts[trigram] += 1
+                    f_pos_trigram_counts[pos_trigram] += 1
 
 
     #sorted_male = sorted(male_word_counts.iteritems(),
@@ -81,26 +97,62 @@ if __name__ == '__main__':
     #print('Number of male tokens: ' + str(n_male_tokens))
     #print('Number of female tokens: ' + str(n_female_tokens))
 
-    sorted_male_bigrams = sorted(male_bigram_counts.iteritems(),
-            key=operator.itemgetter(1), reverse=True)
-    sorted_female_bigrams = sorted(female_bigram_counts.iteritems(),
-            key=operator.itemgetter(1), reverse=True)
+    #sorted_male_bigrams = sorted(male_bigram_counts.iteritems(),
+    #        key=operator.itemgetter(1), reverse=True)
+    #sorted_female_bigrams = sorted(female_bigram_counts.iteritems(),
+    #        key=operator.itemgetter(1), reverse=True)
 
-    print('Top 750 sorted male bigrams: ')
-    print(sorted_male_bigrams[:750])
+    #print('Top 750 sorted male bigrams: ')
+    #print(sorted_male_bigrams[:750])
 
-    print('Top 750 sorted female bigrams: ')
-    print(sorted_female_bigrams[:750])
+    #print('Top 750 sorted female bigrams: ')
+    #print(sorted_female_bigrams[:750])
 
-    print('Number of bigrams when merged: ' + str(len(set(sorted_male_bigrams[:750]
-        + sorted_female_bigrams[:750]))))
+    #print('Number of bigrams when merged: ' + str(len(set(sorted_male_bigrams[:750]
+    #    + sorted_female_bigrams[:750]))))
  
-    top_bigrams = set([bigram for (bigram, count) in sorted_male_bigrams[:750]] +
-            [bigram for (bigram, count) in sorted_female_bigrams[:750]])
+    #top_bigrams = set([bigram for (bigram, count) in sorted_male_bigrams[:750]] +
+    #        [bigram for (bigram, count) in sorted_female_bigrams[:750]])
 
-    top_bigram_file = open('data/top_bigrams', 'wb')
-    pickle.dump(top_bigrams, top_bigram_file)
-    top_bigram_file.close()
+    #top_bigram_file = open('data/top_bigrams', 'wb')
+    #pickle.dump(top_bigrams, top_bigram_file)
+    #top_bigram_file.close()
+
+    #sorted_male_trigrams = sorted(male_trigram_counts.iteritems(),
+    #        key=operator.itemgetter(1), reverse=True)
+    #sorted_female_trigrams = sorted(female_trigram_counts.iteritems(),
+    #        key=operator.itemgetter(1), reverse=True)
+
+    #print('Top 750 sorted male trigrams: ')
+    #print(sorted_male_trigrams[:750])
+
+    #print('Top 750 sorted female trigrams: ')
+    #print(sorted_female_trigrams[:750])
+
+    #print('Number of trigrams when merged: ' + str(len(set(sorted_male_trigrams[:750]
+    #    + sorted_female_trigrams[:750]))))
+ 
+    #top_trigrams = set([trigram for (trigram, count) in sorted_male_trigrams[:750]] +
+    #        [trigram for (trigram, count) in sorted_female_trigrams[:750]])
+
+    #top_trigram_file = open('data/top_trigrams', 'wb')
+    #pickle.dump(top_trigrams, top_trigram_file)
+    #top_trigram_file.close()
+
+    sorted_m_pos_bigrams = sorted(m_pos_bigram_counts.iteritems(),
+            key=operator.itemgetter(1), reverse=True)
+    sorted_f_pos_bigrams = sorted(f_pos_bigram_counts.iteritems(),
+            key=operator.itemgetter(1), reverse=True)
+
+    print('M POS bigrams: ' + str(sorted_m_pos_bigrams))
+    print('F POS bigrams: ' + str(sorted_f_pos_bigrams))
+
+    pos_bigrams = set([bigram for (bigram, count) in sorted_m_pos_bigrams]
+            + [bigram for (bigram, count) in sorted_f_pos_bigrams])
+
+    pos_bigram_file = open('data/pos_bigrams', 'wb')
+    pickle.dump(pos_bigrams, pos_bigram_file)
+    pos_bigram_file.close()
 
     #top_tokens = set([token for (token, count) in sorted_male[:2000]] + [token for
     #    (token, count) in sorted_female[:2000]])
