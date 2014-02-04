@@ -8,8 +8,56 @@ DEV_DATA_FILE = 'data/proc_dev'
 TEST_DATA_FILE = 'data/proc_test'
 
 COMMON_TOKENS_FILE = 'data/top_tokens'
+POS_FILE = 'data/pos_set'
+
+N_ITERATIONS = 25
+
+def pos_features(proc_data, label):
+    # TODO add backoff, pos ngrams
+    # TODO parse and put POS from train including 'OTHER' in file to make this job easier
+    # to handle
+    """ Takes in process data and whether or not to label the features (whether
+    or not the features should be added as part of a training set). Returns the
+    a list of feature dictionaries where the features are the Laplace-smoothed 
+    frequency ofccurrence of the parts of speech in the text. """
+
+    pos_pickled = open(POS_FILE, 'rb')
+    pos_set = pickle.load(pos_pickled)
+    pos_pickled.close()
+    features = []
+
+    for speech_tuple in proc_data:
+        pos_dict = dict.fromkeys(pos_set, 0)
+        pos_dict['OTHER'] = 0
+        token_tuples = speech_tuple[0]
+
+        pos_features = pos_feature_dict(pos_dict, token_tuples)
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((pos_features, gender_tag))
+        else:
+            features.append(pos_features)
+
+    return features
+
+
+def pos_feature_dict(pos_dict, token_tuples):
+
+    for (token, pos) in token_tuples:
+        if pos in pos_dict:
+            pos_dict[pos] += 1
+        else:
+            pos_dict['OTHER'] += 1
+
+    n_pos = len(token_tuples)
+    for pos, count in pos_dict.items():
+        pos_dict[pos] = math.log((count + 1) / (float(n_pos) + len(pos_dict)))
+
+    return pos_dict
 
 def common_token_feature_dict(common_tokens_dict, token_tuples):
+    # TODO fix below docstring
     """ common_tokens_dict is the dictionary whose keys are the most common
     tokens as defined in the common_token_features function and whose values
     are initialized to 0. token_tuples is a list of (token, part-of-speech)
@@ -17,26 +65,11 @@ def common_token_feature_dict(common_tokens_dict, token_tuples):
     common_tokens_dict and whose values are the frequency of occurrence of the
     key token in the text (1 + ln(count/n_tokens) if count != 0, 0 otherwise). """
 
-
     for (token, pos) in token_tuples:
         if token in common_tokens_dict:
             common_tokens_dict[token] = 1
 
     return common_tokens_dict
-    #for (token, pos) in token_tuples:
-    #    if token in common_tokens_dict:
-    #        common_tokens_dict[token] += 1
-
-    #n_tokens = len(token_tuples)
-    #for token, count in common_tokens_dict.items():
-    #    if count != 0:
-    #        common_tokens_dict[token] = 1 + math.log( (count + 1) / (float(n_tokens
-    #            + len(common_tokens_dict))))
-    #    else:
-    #        common_tokens_dict[token] = 1 + math.log( 1 / (float(n_tokens +
-    #             len(common_tokens_dict)))) 
-
-    #return common_tokens_dict
 
 def common_token_features(proc_data, label):
     """ Returns a list of (feature dictionary, label) pairs where the features
@@ -55,10 +88,9 @@ def common_token_features(proc_data, label):
         common_tokens_dict = dict.fromkeys(common_tokens_set, 0)
 
         token_tuples = speech_tuple[0]
-        if label:
-            gender_tag = speech_tuple[1]
 
         if label:
+            gender_tag = speech_tuple[1]
             features.append((common_token_feature_dict(common_tokens_dict, token_tuples),
                 gender_tag))
         else:
@@ -67,8 +99,17 @@ def common_token_features(proc_data, label):
     return features
 
 def extract_features(proc_data, label=False):
-    features = []
-    features += common_token_features(proc_data, label)
+    #features = []
+    #features += pos_features(proc_data, label)
+    common_token_feat = common_token_features(proc_data, label)
+    features = common_token_feat
+    #for i in range(len(features)):
+    #    if label:
+    #        for k, v in common_token_feat[i][0].items():
+    #            features[i][0][k] = v
+    #    else:
+    #        for k, v in common_token_feat[i].items():
+    #            features[i][k] = v
     return features
 
 def extract_labels(proc_data):
@@ -106,7 +147,8 @@ def classify():
     # Set algorithm to GIS because of bug in scipy (missing maxentropy module).
     algorithm = nltk.classify.MaxentClassifier.ALGORITHMS[0]
 
-    classifier = nltk.classify.MaxentClassifier.train(training_set, algorithm)
+    classifier = nltk.classify.MaxentClassifier.train(training_set, algorithm,
+            max_iter=N_ITERATIONS)
 
     dev_set = get_dev_set()
     labels = classifier.batch_classify(dev_set[0])

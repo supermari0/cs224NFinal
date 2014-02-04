@@ -1,0 +1,7 @@
+0.56 something for 100 iterations with word features
+0.547445255474 for 50 iterations with word + pos features
+0.554744525547 for 50 iterations with word features
+0.569343065693 for 50 iterations with top 2K word features
+0.554744525547 for 100 iterations with top 2K word features
+0.56204379562 for 25 iterations with top 2K word features
+- next: try binary POS trigram features. if that works, add bigram with backoff
