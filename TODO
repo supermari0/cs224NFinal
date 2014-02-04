@@ -1,5 +1,6 @@
 TODO
 
+- add bigram features, try with and without backoff, try by itself
 - add POS features with backoff
 
 - decide on evaluation framework - see classification literature, cs229

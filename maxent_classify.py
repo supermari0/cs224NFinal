@@ -7,10 +7,11 @@ TRAIN_DATA_FILE = 'data/proc_train'
 DEV_DATA_FILE = 'data/proc_dev'
 TEST_DATA_FILE = 'data/proc_test'
 
+COMMON_BIGRAMS_FILE = 'data/top_bigrams'
 COMMON_TOKENS_FILE = 'data/top_tokens'
 POS_FILE = 'data/pos_set'
 
-N_ITERATIONS = 50
+N_ITERATIONS = 75
 
 def pos_features(proc_data, label):
     # TODO add backoff, pos ngrams. use indicator vars instead of stats.
@@ -98,11 +99,49 @@ def common_token_features(proc_data, label):
                 token_tuples))
     return features
 
+def common_bigram_features(proc_data, label):
+    common_bigrams_pickled = open(COMMON_BIGRAMS_FILE, 'rb')
+    common_bigrams_set = pickle.load(common_bigrams_pickled)
+    common_bigrams_pickled.close()
+
+    features = []
+
+    for speech_tuple in proc_data:
+        common_bigrams_dict = dict.fromkeys(common_bigrams_set, 0)
+
+        token_tuples = speech_tuple[0]
+        bigram_features = common_bigram_feature_dict(common_bigrams_dict,
+                token_tuples)
+        
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((bigram_features, gender_tag))
+        else:
+            features.append(bigram_features)
+
+    return features
+
+def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
+    for i in range(1, len(token_tuples)):
+        token = token_tuples[i][0]
+        prev_token = token_tuples[i-1][0]
+        bigram = prev_token + '+' + token
+        if bigram in common_bigrams_dict:
+            common_bigrams_dict[bigram] = 1
+
+    return common_bigrams_dict
+
 def extract_features(proc_data, label=False):
     #features = []
     #features += pos_features(proc_data, label)
-    common_token_feat = common_token_features(proc_data, label)
-    features = common_token_feat
+    #common_token_feat = common_token_features(proc_data, label)
+    features = common_bigram_features(proc_data, label)
+    #for i in range(len(features)):
+    #    if label:
+    #        features[i][0].update(common_bigram_feat[i][0])
+    #        print(features[i])
+    #    else:
+    #        features[i].update(common_bigram_feat[i])
     #for i in range(len(features)):
     #    if label:
     #        for k, v in common_token_feat[i][0].items():
@@ -131,7 +170,7 @@ def get_dev_set():
     """ Returns a tuple whose first element is the unlabeled list of feature
     dicts ready for classification and whose second element is the list of
     gold labels. """
-    dev_pickled = open(TEST_DATA_FILE, 'rb')
+    dev_pickled = open(DEV_DATA_FILE, 'rb')
     dev_proc_data = pickle.load(dev_pickled)
     dev_pickled.close()
 

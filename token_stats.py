@@ -86,17 +86,17 @@ if __name__ == '__main__':
     sorted_female_bigrams = sorted(female_bigram_counts.iteritems(),
             key=operator.itemgetter(1), reverse=True)
 
-    print('Top 500 sorted male bigrams: ')
-    print(sorted_male_bigrams[:500])
+    print('Top 750 sorted male bigrams: ')
+    print(sorted_male_bigrams[:750])
 
-    print('Top 500 sorted female bigrams: ')
-    print(sorted_female_bigrams[:500])
+    print('Top 750 sorted female bigrams: ')
+    print(sorted_female_bigrams[:750])
 
-    print('Number of bigrams when merged: ' + str(len(set(sorted_male_bigrams[:500]
-        + sorted_female_bigrams[:500]))))
+    print('Number of bigrams when merged: ' + str(len(set(sorted_male_bigrams[:750]
+        + sorted_female_bigrams[:750]))))
  
-    top_bigrams = set([bigram for (bigram, count) in sorted_male_bigrams[:500]] +
-            [bigram for (bigram, count) in sorted_female_bigrams[:500]])
+    top_bigrams = set([bigram for (bigram, count) in sorted_male_bigrams[:750]] +
+            [bigram for (bigram, count) in sorted_female_bigrams[:750]])
 
     top_bigram_file = open('data/top_bigrams', 'wb')
     pickle.dump(top_bigrams, top_bigram_file)
