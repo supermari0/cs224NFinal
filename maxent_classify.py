@@ -10,10 +10,10 @@ TEST_DATA_FILE = 'data/proc_test'
 COMMON_TOKENS_FILE = 'data/top_tokens'
 POS_FILE = 'data/pos_set'
 
-N_ITERATIONS = 25
+N_ITERATIONS = 50
 
 def pos_features(proc_data, label):
-    # TODO add backoff, pos ngrams
+    # TODO add backoff, pos ngrams. use indicator vars instead of stats.
     # TODO parse and put POS from train including 'OTHER' in file to make this job easier
     # to handle
     """ Takes in process data and whether or not to label the features (whether
@@ -57,13 +57,12 @@ def pos_feature_dict(pos_dict, token_tuples):
     return pos_dict
 
 def common_token_feature_dict(common_tokens_dict, token_tuples):
-    # TODO fix below docstring
     """ common_tokens_dict is the dictionary whose keys are the most common
     tokens as defined in the common_token_features function and whose values
     are initialized to 0. token_tuples is a list of (token, part-of-speech)
     tuples. The function returns a dictionary whose keys are the keys of
-    common_tokens_dict and whose values are the frequency of occurrence of the
-    key token in the text (1 + ln(count/n_tokens) if count != 0, 0 otherwise). """
+    common_tokens_dict and whose values are 1 if the token is in the speech, 0
+    otherwise. """
 
     for (token, pos) in token_tuples:
         if token in common_tokens_dict:
@@ -72,11 +71,12 @@ def common_token_feature_dict(common_tokens_dict, token_tuples):
     return common_tokens_dict
 
 def common_token_features(proc_data, label):
-    """ Returns a list of (feature dictionary, label) pairs where the features
-    are the frequency of occurrence of the most common tokens. The most common
-    tokens are defined as the intersection of the top 300 tokens said by male
-    characters and top 300 tokens said by female characters in the training
-    data. These are precomputed. """
+    """ Returns a list of (feature dictionary, label) (label only if
+    label==True) pairs where the features are the frequency of occurrence of
+    the most common tokens. The most common tokens are defined as the
+    intersection of the top 2K tokens said by male characters and top 2K
+    tokens said by female characters in the training data. These are
+    precomputed. """
 
     common_tokens_pickled = open(COMMON_TOKENS_FILE, 'rb')
     common_tokens_set = pickle.load(common_tokens_pickled)
