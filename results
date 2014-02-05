@@ -15,12 +15,15 @@
 Accuracy: 0.63503649635
 Precision: 0.594202898551
 Recall: 0.650793650794
+F1 Score: 0.621212121212
+
 
 1.5K bigram features + bigram POS features:
 Accuracy: 0.642335766423
 Precision: 0.623188405797
 Recall: 0.651515151515
+F1 Score: 0.637037037037
 
 1.5K bigram features + bigram POS features + trigram POS features:
 
-- next: try binary POS trigram features. if that works, add bigram with backoff
+- see TODO for more feature ideas

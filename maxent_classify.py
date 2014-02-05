@@ -201,19 +201,13 @@ def common_trigram_feature_dict(common_trigrams_dict, token_tuples):
 
 
 def extract_features(proc_data, label=False):
-    #features = []
-    #features += pos_features(proc_data, label)
-    #common_trigram_feat = common_trigram_features(proc_data, label)
     features = common_bigram_features(proc_data, label)
-    #pos_bigram_feat = pos_bigram_features(proc_data, label)
-    #print pos_bigram_feat
-    #for i in range(len(features)):
-    #    if label:
-    #        features[i][0].update(pos_bigram_feat[i][0])
-    #        print features[i]
-    #    else:
-    #        features[i].update(pos_bigram_feat[i])
-    #        print features[i]
+    pos_bigram_feat = pos_bigram_features(proc_data, label)
+    for i in range(len(features)):
+        if label:
+            features[i][0].update(pos_bigram_feat[i][0])
+        else:
+            features[i].update(pos_bigram_feat[i])
     return features
 
 def extract_labels(proc_data):
@@ -259,11 +253,14 @@ def classify():
     labels = classifier.batch_classify(dev_set[0])
     print labels
 
+    # Get result statistics
+
     correct = 0
     true_male = 0
     true_female = 0
     false_male = 0
     false_female = 0
+
     for i in range(len(labels)):
         if labels[i] == dev_set[1][i]:
             correct += 1
@@ -276,9 +273,16 @@ def classify():
                 false_female += 1
             else:
                 false_male += 1
-    print('Accuracy: ' + str(float(correct)/len(labels)))
-    print('Precision: ' + str(float(true_male) / (true_male + false_male)))
-    print('Recall: ' + str(float(true_male) / (true_male + false_female)))
+
+    accuracy = float(correct)/len(labels)
+    precision = float(true_male) / (true_male + false_male)
+    recall = float(true_male) / (true_male + false_female)
+    f1_score = 2 * ( (precision * recall) / (precision + recall))
+
+    print('Accuracy: ' + str(accuracy))
+    print('Precision: ' + str(precision))
+    print('Recall: ' + str(recall))
+    print('F1 Score: ' + str(f1_score))
 
 if __name__ == '__main__':
     classify()

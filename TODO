@@ -1,16 +1,20 @@
 TODO
 
-- clean up files
+- clean up maxent_classify.py - put extraneous features in another file, switch
+  from maxent_classify.py to classify.py
+  - later: merge features into one-pass?, add command line args for different
+    classifiers, different train/test sets
 
-- add bigram features, try with and without backoff, try by itself
-- add POS features with backoff
+- add POS trigram with and without backoff, try that + bigram words and that +
+  bigram pos + bigram words
 
-- decide on evaluation framework - see classification literature, cs229
-    - probably just simple precision/recall/accuracy/f1
+- number of male and female names said
+- titles
+- titles in close proximity to I or Me
+- percentage of the words that are more commonly said by women
+-- do all of above by mid-day Thursday --
 
 - fix, comment better token_stats.py - call it vocab_gen or something
-- maxent
-    - add features incrementally
 
 - svm
     - research, decide on new feature set
