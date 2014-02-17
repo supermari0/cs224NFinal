@@ -139,20 +139,35 @@ if __name__ == '__main__':
     #pickle.dump(top_trigrams, top_trigram_file)
     #top_trigram_file.close()
 
-    sorted_m_pos_bigrams = sorted(m_pos_bigram_counts.iteritems(),
+    #sorted_m_pos_bigrams = sorted(m_pos_bigram_counts.iteritems(),
+    #        key=operator.itemgetter(1), reverse=True)
+    #sorted_f_pos_bigrams = sorted(f_pos_bigram_counts.iteritems(),
+    #        key=operator.itemgetter(1), reverse=True)
+
+    #print('M POS bigrams: ' + str(sorted_m_pos_bigrams))
+    #print('F POS bigrams: ' + str(sorted_f_pos_bigrams))
+
+    #pos_bigrams = set([bigram for (bigram, count) in sorted_m_pos_bigrams]
+    #        + [bigram for (bigram, count) in sorted_f_pos_bigrams])
+
+    #pos_bigram_file = open('data/pos_bigrams', 'wb')
+    #pickle.dump(pos_bigrams, pos_bigram_file)
+    #pos_bigram_file.close()
+
+    sorted_m_pos_trigrams = sorted(m_pos_trigram_counts.iteritems(),
             key=operator.itemgetter(1), reverse=True)
-    sorted_f_pos_bigrams = sorted(f_pos_bigram_counts.iteritems(),
+    sorted_f_pos_trigrams = sorted(f_pos_trigram_counts.iteritems(),
             key=operator.itemgetter(1), reverse=True)
 
-    print('M POS bigrams: ' + str(sorted_m_pos_bigrams))
-    print('F POS bigrams: ' + str(sorted_f_pos_bigrams))
+    print('M POS trigrams: ' + str(sorted_m_pos_trigrams))
+    print('F POS trigrams: ' + str(sorted_f_pos_trigrams))
 
-    pos_bigrams = set([bigram for (bigram, count) in sorted_m_pos_bigrams]
-            + [bigram for (bigram, count) in sorted_f_pos_bigrams])
+    pos_trigrams = set([trigram for (trigram, count) in sorted_m_pos_trigrams]
+            + [trigram for (trigram, count) in sorted_f_pos_trigrams])
 
-    pos_bigram_file = open('data/pos_bigrams', 'wb')
-    pickle.dump(pos_bigrams, pos_bigram_file)
-    pos_bigram_file.close()
+    pos_trigram_file = open('data/pos_trigrams', 'wb')
+    pickle.dump(pos_trigrams, pos_trigram_file)
+    pos_trigram_file.close()
 
     #top_tokens = set([token for (token, count) in sorted_male[:2000]] + [token for
     #    (token, count) in sorted_female[:2000]])

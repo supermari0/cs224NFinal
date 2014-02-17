@@ -13,8 +13,9 @@ COMMON_TRIGRAMS_FILE = 'data/top_trigrams'
 
 POS_FILE = 'data/pos_set'
 POS_BIGRAMS_FILE = 'data/pos_bigrams'
+POS_TRIGRAMS_FILE = 'data/pos_trigrams'
 
-N_ITERATIONS = 75
+N_ITERATIONS = 50
 
 def pos_bigram_features(proc_data, label):
     pos_bigrams_pickled = open(POS_BIGRAMS_FILE, 'rb')
@@ -46,6 +47,38 @@ def pos_bigram_feature_dict(pos_bigrams_dict, token_tuples):
         if pos_bigram in pos_bigrams_dict:
             pos_bigrams_dict[pos_bigram] = 1
     return pos_bigrams_dict
+
+def pos_trigram_features(proc_data, label):
+    pos_trigrams_pickled = open(POS_TRIGRAMS_FILE, 'rb')
+    pos_trigrams_set = pickle.load(pos_trigrams_pickled)
+    pos_trigrams_pickled.close()
+
+    features = []
+
+    for speech_tuple in proc_data:
+        pos_trigrams_dict = dict.fromkeys(pos_trigrams_set, 0)
+
+        token_tuples = speech_tuple[0]
+        pos_trigram_features = pos_trigram_feature_dict(pos_trigrams_dict,
+                token_tuples)
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((pos_trigram_features, gender_tag))
+        else:
+            features.append(pos_trigram_features)
+
+    return features
+
+def pos_trigram_feature_dict(pos_trigrams_dict, token_tuples):
+    for i in range(2, len(token_tuples)):
+        pos = token_tuples[i][1]
+        prev_pos = token_tuples[i-1][1]
+        prev2_pos = token_tuples[i-2][1]
+        pos_trigram = prev2_pos + '+' + prev_pos + '+' + pos
+        if pos_trigram in pos_trigrams_dict:
+            pos_trigrams_dict[pos_trigram] = 1
+    return pos_trigrams_dict
 
 def common_bigram_features(proc_data, label):
     common_bigrams_pickled = open(COMMON_BIGRAMS_FILE, 'rb')
@@ -83,12 +116,15 @@ def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
 
 def extract_features(proc_data, label=False):
     features = common_bigram_features(proc_data, label)
-    pos_bigram_feat = pos_bigram_features(proc_data, label)
+    #pos_bigram_feat = pos_bigram_features(proc_data, label)
+    pos_trigram_feat = pos_trigram_features(proc_data, label)
     for i in range(len(features)):
         if label:
-            features[i][0].update(pos_bigram_feat[i][0])
+            #features[i][0].update(pos_bigram_feat[i][0])
+            features[i][0].update(pos_trigram_feat[i][0])
         else:
-            features[i].update(pos_bigram_feat[i])
+            #features[i].update(pos_bigram_feat[i])
+            features[i].update(pos_trigram_feat[i])
     return features
 
 def extract_labels(proc_data):
