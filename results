@@ -117,4 +117,11 @@ Precision: 0.724637681159
 Recall: 0.632911392405
 F1 Score: 0.675675675676
 
+1.5K bigram features, trigram POS features, discretized len features, pos
+frequency, 50 iterations:
+Accuracy: 0.620437956204
+Precision: 0.594202898551
+Recall: 0.630769230769
+F1 Score: 0.611940298507
+
 - see TODO for more feature ideas

@@ -162,3 +162,31 @@ def thine_features(proc_data, label):
 
     return features
 
+def pos_freq_features(proc_data, label):
+    pos_pickled = open(POS_FILE, 'rb')
+    pos_set = pickle.load(pos_pickled)
+    pos_pickled.close()
+
+    features = []
+
+    for speech_tuple in proc_data:
+        pos_dict = dict.fromkeys(pos_set, 0)
+
+        token_tuples = speech_tuple[0]
+
+        for (token, pos) in token_tuples:
+            if pos in pos_dict:
+                pos_dict[pos] += 1
+
+        for pos in pos_dict:
+            pos_dict[pos] = (float(pos_dict[pos]) / len(token_tuples)) * 100.0
+
+        print pos_dict
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((pos_dict, gender_tag))
+        else:
+            features.append(pos_dict)
+    
+    return features
+

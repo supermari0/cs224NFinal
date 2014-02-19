@@ -23,6 +23,9 @@ def len_features(proc_data, label):
     for speech_tuple in proc_data:
         token_tuples = speech_tuple[0]
 
+        for token in token_tuples:
+            print token[0]
+
         speech_len = len(token_tuples)
 
         if speech_len < 500:
@@ -145,6 +148,7 @@ def extract_features(proc_data, label=False):
     features = common_bigram_features(proc_data, label)
     pos_trigram_feat = pos_trigram_features(proc_data, label)
     len_feat = len_features(proc_data, label)
+
     for i in range(len(features)):
         if label:
             features[i][0].update(pos_trigram_feat[i][0])
