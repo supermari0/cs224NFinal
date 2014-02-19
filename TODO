@@ -1,17 +1,17 @@
 TODO
 
-- clean up maxent_classify.py - put extraneous features in another file, switch
-  from maxent_classify.py to classify.py
-  - later: merge features into one-pass?, add command line args for different
-    classifiers, different train/test sets
-
-- add POS trigram with and without backoff, try that + bigram words and that +
-  bigram pos + bigram words
-
+- add length, average line length as features
+- try interpolation and backoff with bigram/trigram
+- frequency of possessives (mine, thine)
 - number of male and female names said
 - titles
 - titles in close proximity to I or Me
 - percentage of the words that are more commonly said by women
+
+
+- later: merge features into one-pass?, add command line args for different
+    classifiers, different train/test sets
+
 -- do all of above by mid-day Thursday --
 
 - fix, comment better token_stats.py - call it vocab_gen or something

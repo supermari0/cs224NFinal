@@ -10,6 +10,7 @@
 0.63503649635 for 75 iterations with 1.5K bigram features only
 0.532846715328 for 75 iterations with 1.5K trigram features only
 
+below are 75 iterations unless otherwise specified:
 
 1.5K bigram features:
 Accuracy: 0.63503649635
@@ -25,5 +26,74 @@ Recall: 0.651515151515
 F1 Score: 0.637037037037
 
 1.5K bigram features + bigram POS features + trigram POS features:
+Accuracy: 0.598540145985
+Precision: 0.579710144928
+Recall: 0.606060606061
+F1 Score: 0.592592592593
+
+1.5K bigram features + trigram POS features:
+Accuracy: 0.63503649635
+Precision: 0.68115942029
+Recall: 0.626666666667
+F1 Score: 0.652777777778
+
+1.5K bigram features + trigram POS features, 100 iterations:
+Accuracy: 0.63503649635
+Precision: 0.68115942029
+Recall: 0.626666666667
+F1 Score: 0.652777777778
+
+1.5K bigram features + trigram POS features, 50 iterations:
+Accuracy: 0.656934306569
+Precision: 0.710144927536
+Recall: 0.644736842105
+F1 Score: 0.675862068966
+
+1.5K bigram features, trigram POS features, 60 iterations:
+Accuracy: 0.642335766423
+Precision: 0.695652173913
+Recall: 0.631578947368
+F1 Score: 0.662068965517
+
+1.5K bigram features, trigram POS features, 40 iterations
+Accuracy: 0.642335766423
+Precision: 0.710144927536
+Recall: 0.628205128205
+F1 Score: 0.666666666667
+
+1.5K bigram features, trigram POS features, non-discretized len feature, 50
+iterations:
+Accuracy: 0.649635036496
+Precision: 0.695652173913
+Recall: 0.64
+F1 Score: 0.666666666667
+
+1.5K bigram features, trigram POS features, non-discretized len feature, 75
+iterations:
+Accuracy: 0.63503649635
+Precision: 0.68115942029
+Recall: 0.626666666667
+F1 Score: 0.652777777778
+
+1.5K bigram features, trigram POS features, non-discretized len feature, 40
+iterations:
+Accuracy: 0.642335766423
+Precision: 0.710144927536
+Recall: 0.628205128205
+F1 Score: 0.666666666667
+
+*1.5K bigram features, trigram POS features, discretized len features, 50
+iteratoins:
+Accuracy: 0.656934306569
+Precision: 0.724637681159
+Recall: 0.641025641026
+F1 Score: 0.680272108844
+
+1.5K bigram features, trigram POS features, discretized len features, 75
+iterations:
+Accuracy: 0.627737226277
+Precision: 0.695652173913
+Recall: 0.615384615385
+F1 Score: 0.65306122449
 
 - see TODO for more feature ideas

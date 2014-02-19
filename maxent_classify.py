@@ -17,6 +17,35 @@ POS_TRIGRAMS_FILE = 'data/pos_trigrams'
 
 N_ITERATIONS = 50
 
+def len_features(proc_data, label):
+    features = []
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        speech_len = len(token_tuples)
+
+        if speech_len < 500:
+            speech_len = 1
+        elif speech_len < 1000:
+            speech_len = 2
+        elif speech_len < 2000:
+            speech_len = 3
+        elif speech_len < 3000:
+            speech_len = 4
+        elif speech_len < 4000:
+            speech_len = 5
+        else:
+            speech_len = 6
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'speech_len' : speech_len}, gender_tag))
+        else:
+            features.append({'speech_len' : speech_len})
+
+    return features
+
 def pos_bigram_features(proc_data, label):
     pos_bigrams_pickled = open(POS_BIGRAMS_FILE, 'rb')
     pos_bigrams_set = pickle.load(pos_bigrams_pickled)
@@ -112,19 +141,20 @@ def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
 
     return common_bigrams_dict
 
-
-
 def extract_features(proc_data, label=False):
     features = common_bigram_features(proc_data, label)
     #pos_bigram_feat = pos_bigram_features(proc_data, label)
     pos_trigram_feat = pos_trigram_features(proc_data, label)
+    len_feat = len_features(proc_data, label)
     for i in range(len(features)):
         if label:
             #features[i][0].update(pos_bigram_feat[i][0])
             features[i][0].update(pos_trigram_feat[i][0])
+            features[i][0].update(len_feat[i][0])
         else:
             #features[i].update(pos_bigram_feat[i])
             features[i].update(pos_trigram_feat[i])
+            features[i].update(len_feat[i])
     return features
 
 def extract_labels(proc_data):
