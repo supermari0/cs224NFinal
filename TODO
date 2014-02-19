@@ -1,8 +1,7 @@
 TODO
 
-- add length, average line length as features
-- try interpolation and backoff with bigram/trigram
 - frequency of possessives (mine, thine)
+- try interpolation and backoff with bigram/trigram
 - number of male and female names said
 - titles
 - titles in close proximity to I or Me

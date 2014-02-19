@@ -143,16 +143,13 @@ def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
 
 def extract_features(proc_data, label=False):
     features = common_bigram_features(proc_data, label)
-    #pos_bigram_feat = pos_bigram_features(proc_data, label)
     pos_trigram_feat = pos_trigram_features(proc_data, label)
     len_feat = len_features(proc_data, label)
     for i in range(len(features)):
         if label:
-            #features[i][0].update(pos_bigram_feat[i][0])
             features[i][0].update(pos_trigram_feat[i][0])
             features[i][0].update(len_feat[i][0])
         else:
-            #features[i].update(pos_bigram_feat[i])
             features[i].update(pos_trigram_feat[i])
             features[i].update(len_feat[i])
     return features

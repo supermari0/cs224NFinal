@@ -118,3 +118,47 @@ def common_trigram_feature_dict(common_trigrams_dict, token_tuples):
 
     return common_trigrams_dict
 
+def mine_features(proc_data, label):
+    features = []
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        mine_count = 0
+        for (token, pos) in token_tuples:
+            if token == 'mine':
+                mine_count += 1
+
+        mine_count_log = math.log(float(mine_count + 1) / (len(token_tuples) +
+            len(proc_data)))
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_mine': mine_count_log}, gender_tag))
+        else:
+            features.append({'n_mine': mine_count_log})
+
+    return features
+
+def thine_features(proc_data, label):
+    features = []
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        thine_count = 0
+        for (token, pos) in token_tuples:
+            if token == 'thine':
+                thine_count += 1
+
+        #mine_count_log = math.log(float(mine_count + 1) / (len(token_tuples) +
+            #len(proc_data)))
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_thine': thine_count}, gender_tag))
+        else:
+            features.append({'n_thine': thine_count})
+
+    return features
+
