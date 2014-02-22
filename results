@@ -124,4 +124,25 @@ Precision: 0.594202898551
 Recall: 0.630769230769
 F1 Score: 0.611940298507
 
+1.5K bigram features, trigram POS features, discretized len features, count of male
+and/or female names:
+Accuracy: 0.656934306569
+Precision: 0.724637681159
+Recall: 0.641025641026
+F1 Score: 0.680272108844
+
+1.5K bigram features, trigram POS features, discretized len features, Naive
+Bayes classifier:
+Accuracy: 0.576642335766
+Precision: 0.710144927536
+Recall: 0.563218390805
+F1 Score: 0.628205128205
+
+1.5K bigram features, trigram POS features, discretized len features, SVM
+classifier (LinearSVC):
+Accuracy: 0.569343065693
+Precision: 0.666666666667
+Recall: 0.560975609756
+F1 Score: 0.609271523179
+
 - see TODO for more feature ideas

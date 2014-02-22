@@ -2,6 +2,8 @@ import collections
 import math
 import nltk
 import pickle
+import sklearn
+from sklearn.svm import LinearSVC
 
 TRAIN_DATA_FILE = 'data/proc_train'
 DEV_DATA_FILE = 'data/proc_dev'
@@ -15,6 +17,9 @@ POS_FILE = 'data/pos_set'
 POS_BIGRAMS_FILE = 'data/pos_bigrams'
 POS_TRIGRAMS_FILE = 'data/pos_trigrams'
 
+MALE_NAMES_FILE = 'data/male_names.txt'
+FEMALE_NAMES_FILE = 'data/female_names.txt'
+
 N_ITERATIONS = 50
 
 def len_features(proc_data, label):
@@ -22,9 +27,6 @@ def len_features(proc_data, label):
 
     for speech_tuple in proc_data:
         token_tuples = speech_tuple[0]
-
-        for token in token_tuples:
-            print token[0]
 
         speech_len = len(token_tuples)
 
@@ -195,6 +197,11 @@ def classify():
 
     classifier = nltk.classify.MaxentClassifier.train(training_set, algorithm,
             max_iter=N_ITERATIONS)
+
+    #classifier = nltk.classify.NaiveBayesClassifier.train(training_set)
+
+    #classifier = nltk.classify.SklearnClassifier(LinearSVC())
+    #classifier.train(training_set)
 
 
     dev_set = get_dev_set()

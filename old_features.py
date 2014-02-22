@@ -190,3 +190,58 @@ def pos_freq_features(proc_data, label):
     
     return features
 
+def male_name_features(proc_data, label):
+    features = []
+
+    male_names_set = set()
+    male_name_file = open(MALE_NAMES_FILE, 'r')
+
+    for name in male_name_file:
+        male_names_set.add(name.lower().strip())
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        male_name_count = 0
+
+        for token_pos in token_tuples:
+            token = token_pos[0]
+            
+            if token in male_names_set:
+                male_name_count += 1
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_male_names' : male_name_count}, gender_tag))
+        else:
+            features.append({'n_male_names' : male_name_count})
+
+    return features
+
+def female_name_features(proc_data, label):
+    features = []
+
+    female_names_set = set()
+    female_name_file = open(FEMALE_NAMES_FILE, 'r')
+
+    for name in female_name_file:
+        female_names_set.add(name.lower().strip())
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        female_name_count = 0
+
+        for token_pos in token_tuples:
+            token = token_pos[0]
+            
+            if token in female_names_set:
+                female_name_count += 1
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_female_names' : female_name_count}, gender_tag))
+        else:
+            features.append({'n_female_names' : female_name_count})
+
+    return features
