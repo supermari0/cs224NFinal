@@ -4,19 +4,19 @@ x different algorithms, cross-validation
     x NaiveBayes -- sucks
     x SVM - sucks
 
-- figure out why Naive Bayes and SVM suck with this feature set, try with
+X figure out why Naive Bayes and SVM suck with this feature set, try with
   different feature sets
 
 - another feature to try -- "I" or "me" in the same sentence as male or female
   name
-
+- try combining svm features (maybe just binary features, read more about this)
 - add cross-validation
 
-- later: merge features into one-pass?, add command line args for different
-    classifiers, different train/test sets
+^^ above by EOD Thursday
+
+- later: merge features into one-pass?
 
 - fix, comment better token_stats.py - call it vocab_gen or something
-
 
 - after done with Shakespeare, try to eval author gender.
 - after that, try to classify modern texts; then, train on modern texts and
