@@ -1,6 +1,7 @@
 import collections
 import math
 import nltk
+from optparse import OptionParser
 import pickle
 import sklearn
 from sklearn.svm import LinearSVC
@@ -190,18 +191,29 @@ def get_dev_set():
 
 
 def classify():
+    parser = OptionParser()
+    parser.add_option('-a', '--algorithm', dest='algorithm', help='sets' +
+        ' algorithm to one of NaiveBayes, SVM, or MaxEnt. defaults to MaxEnt')
+    (options, args) = parser.parse_args()
+
+    algo_choice = options.algorithm
+
     training_set = get_training_set()
     
-    # Set algorithm to GIS because of bug in scipy (missing maxentropy module).
-    algorithm = nltk.classify.MaxentClassifier.ALGORITHMS[0]
+    if algo_choice is None or algo_choice == 'MaxEnt':
+        print('Training classifier with MaxEnt algorithm...')
+        # Set algorithm to GIS because of bug in scipy (missing maxentropy module).
+        algorithm = nltk.classify.MaxentClassifier.ALGORITHMS[0]
 
-    classifier = nltk.classify.MaxentClassifier.train(training_set, algorithm,
-            max_iter=N_ITERATIONS)
-
-    #classifier = nltk.classify.NaiveBayesClassifier.train(training_set)
-
-    #classifier = nltk.classify.SklearnClassifier(LinearSVC())
-    #classifier.train(training_set)
+        classifier = nltk.classify.MaxentClassifier.train(training_set, algorithm,
+                max_iter=N_ITERATIONS)
+    elif algo_choice == 'NaiveBayes':
+        print('Training classifier with NaiveBayes algorithm...')
+        classifier = nltk.classify.NaiveBayesClassifier.train(training_set)
+    elif algo_choice == 'SVM':
+        print('Training classifier with SVM algorithm...')
+        classifier = nltk.classify.SklearnClassifier(LinearSVC())
+        classifier.train(training_set)
 
 
     dev_set = get_dev_set()

@@ -1,6 +1,6 @@
 TODO
 
-- different algorithms, cross-validation
+x different algorithms, cross-validation
     x NaiveBayes -- sucks
     x SVM - sucks
 
@@ -9,6 +9,8 @@ TODO
 
 - another feature to try -- "I" or "me" in the same sentence as male or female
   name
+
+- add cross-validation
 
 - later: merge features into one-pass?, add command line args for different
     classifiers, different train/test sets
