@@ -147,18 +147,217 @@ def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
 
     return common_bigrams_dict
 
-def extract_features(proc_data, label=False):
+def common_trigram_features(proc_data, label):
+    common_trigrams_pickled = open(COMMON_TRIGRAMS_FILE, 'rb')
+    common_trigrams_set = pickle.load(common_trigrams_pickled)
+    common_trigrams_pickled.close()
+
+    features = []
+
+    for speech_tuple in proc_data:
+        common_trigrams_dict = dict.fromkeys(common_trigrams_set, 0)
+
+        token_tuples = speech_tuple[0]
+        trigram_features = common_trigram_feature_dict(common_trigrams_dict,
+                token_tuples)
+        
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((trigram_features, gender_tag))
+        else:
+            features.append(trigram_features)
+
+    return features
+
+def common_trigram_feature_dict(common_trigrams_dict, token_tuples):
+    for i in range(2, len(token_tuples)):
+        token = token_tuples[i][0]
+        prev_token = token_tuples[i-1][0]
+        prev2_token = token_tuples[i-2][0]
+        trigram = prev2_token + '+' + prev_token + '+' + token
+        if trigram in common_trigrams_dict:
+            common_trigrams_dict[trigram] = 1
+
+    return common_trigrams_dict
+
+def male_name_features(proc_data, label):
+    features = []
+
+    male_names_set = set()
+    male_name_file = open(MALE_NAMES_FILE, 'r')
+
+    for name in male_name_file:
+        male_names_set.add(name.lower().strip())
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        male_name_count = 0
+
+        for token_pos in token_tuples:
+            token = token_pos[0]
+            
+            if token in male_names_set:
+                male_name_count += 1
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_male_names' : male_name_count}, gender_tag))
+        else:
+            features.append({'n_male_names' : male_name_count})
+
+    return features
+
+def female_name_features(proc_data, label):
+    features = []
+
+    female_names_set = set()
+    female_name_file = open(FEMALE_NAMES_FILE, 'r')
+
+    for name in female_name_file:
+        female_names_set.add(name.lower().strip())
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        female_name_count = 0
+
+        for token_pos in token_tuples:
+            token = token_pos[0]
+            
+            if token in female_names_set:
+                female_name_count += 1
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_female_names' : female_name_count}, gender_tag))
+        else:
+            features.append({'n_female_names' : female_name_count})
+
+    return features
+
+def common_token_feature_dict(common_tokens_dict, token_tuples):
+    """ common_tokens_dict is the dictionary whose keys are the most common
+    tokens as defined in the common_token_features function and whose values
+    are initialized to 0. token_tuples is a list of (token, part-of-speech)
+    tuples. The function returns a dictionary whose keys are the keys of
+    common_tokens_dict and whose values are 1 if the token is in the speech, 0
+    otherwise. """
+
+    for (token, pos) in token_tuples:
+        if token in common_tokens_dict:
+            common_tokens_dict[token] = 1
+
+    return common_tokens_dict
+
+def common_token_features(proc_data, label):
+    """ Returns a list of (feature dictionary, label) (label only if
+    label==True) pairs where the features are the frequency of occurrence of
+    the most common tokens. The most common tokens are defined as the
+    intersection of the top 2K tokens said by male characters and top 2K
+    tokens said by female characters in the training data. These are
+    precomputed. """
+
+    common_tokens_pickled = open(COMMON_TOKENS_FILE, 'rb')
+    common_tokens_set = pickle.load(common_tokens_pickled)
+    common_tokens_pickled.close()
+
+    features = []
+
+    for speech_tuple in proc_data:
+        common_tokens_dict = dict.fromkeys(common_tokens_set, 0)
+
+
+        token_tuples = speech_tuple[0]
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append((common_token_feature_dict(common_tokens_dict, token_tuples),
+                gender_tag))
+        else:
+            features.append(common_token_feature_dict(common_tokens_dict,
+                token_tuples))
+    return features
+
+def mine_features(proc_data, label):
+    features = []
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        mine_count = 0
+        for (token, pos) in token_tuples:
+            if token == 'mine':
+                mine_count += 1
+
+        mine_count_log = math.log(float(mine_count + 1) / (len(token_tuples) +
+            len(proc_data)))
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_mine': mine_count_log}, gender_tag))
+        else:
+            features.append({'n_mine': mine_count_log})
+
+    return features
+
+def thine_features(proc_data, label):
+    features = []
+
+    for speech_tuple in proc_data:
+        token_tuples = speech_tuple[0]
+
+        thine_count = 0
+        for (token, pos) in token_tuples:
+            if token == 'thine':
+                thine_count += 1
+
+        thine_count_log = math.log(float(thine_count + 1) / (len(token_tuples) +
+            len(proc_data)))
+
+        if label:
+            gender_tag = speech_tuple[1]
+            features.append(({'n_thine': thine_count}, gender_tag))
+        else:
+            features.append({'n_thine': thine_count})
+
+    return features
+
+
+def extract_features(proc_data, label=False, algorithm='MaxEnt'):
     features = common_bigram_features(proc_data, label)
     pos_trigram_feat = pos_trigram_features(proc_data, label)
     len_feat = len_features(proc_data, label)
+
+    if algorithm == 'SVM':
+        trigram_feat = common_trigram_features(proc_data, label)
+        male_name_feat = male_name_features(proc_data, label)
+        female_name_feat = female_name_features(proc_data, label)
+        token_feat = common_token_features(proc_data, label)
+        mine_feat = mine_features(proc_data, label)
+        thine_feat = thine_features(proc_data, label)
 
     for i in range(len(features)):
         if label:
             features[i][0].update(pos_trigram_feat[i][0])
             features[i][0].update(len_feat[i][0])
+            if algorithm == 'SVM':
+                features[i][0].update(trigram_feat[i][0])
+                features[i][0].update(male_name_feat[i][0])
+                features[i][0].update(female_name_feat[i][0])
+                features[i][0].update(token_feat[i][0])
+                features[i][0].update(mine_feat[i][0])
+                features[i][0].update(thine_feat[i][0])
         else:
             features[i].update(pos_trigram_feat[i])
             features[i].update(len_feat[i])
+            if algorithm == 'SVM':
+                features[i].update(trigram_feat[i])
+                features[i].update(male_name_feat[i])
+                features[i].update(female_name_feat[i])
+                features[i].update(token_feat[i])
+                features[i].update(mine_feat[i])
+                features[i].update(thine_feat[i])
     return features
 
 def extract_labels(proc_data):
@@ -167,12 +366,13 @@ def extract_labels(proc_data):
         labels += speech_tuple[1]
     return labels
 
-def get_training_set():
+def get_training_set(algorithm):
     train_pickled = open(TRAIN_DATA_FILE, 'rb')
     train_proc_data = pickle.load(train_pickled)
     train_pickled.close()
    
-    featureset = extract_features(train_proc_data, label=True)
+    featureset = extract_features(train_proc_data, label=True,
+        algorithm='MaxEnt')
 
     return featureset
 
@@ -198,7 +398,7 @@ def classify():
 
     algo_choice = options.algorithm
 
-    training_set = get_training_set()
+    training_set = get_training_set(algo_choice)
     
     if algo_choice is None or algo_choice == 'MaxEnt':
         print('Training classifier with MaxEnt algorithm...')

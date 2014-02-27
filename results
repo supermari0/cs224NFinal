@@ -145,4 +145,51 @@ Precision: 0.666666666667
 Recall: 0.560975609756
 F1 Score: 0.609271523179
 
-- see TODO for more feature ideas
+1.5K bigram features, trigram POS features, discretized len features, trigram
+features, SVM:
+Accuracy: 0.583941605839
+Precision: 0.594202898551
+Recall: 0.585714285714
+F1 Score: 0.589928057554
+
+1.5K bigram features, trigram POS features, discretized len features, trigram
+features, NaiveBayes:
+Accuracy: 0.569343065693
+Precision: 0.739130434783
+Recall: 0.554347826087
+F1 Score: 0.633540372671
+
+1.5K bigram features, trigram POS features, discretized len features, trigram
+features, male/female name count, SVM:
+Accuracy: 0.605839416058
+Precision: 0.623188405797
+Recall: 0.605633802817
+F1 Score: 0.614285714286
+
+1.5K bigram features, trigram POS features, discretized len features, trigram
+features, male/female name count, NaiveBayes:
+Accuracy: 0.569343065693
+Precision: 0.739130434783
+Recall: 0.554347826087
+F1 Score: 0.633540372671
+
+1.5K bigram features, trigram POS features, discretized len features, trigram
+features, token features, male/female name count, SVM:
+Accuracy: 0.605839416058
+Precision: 0.695652173913
+Recall: 0.592592592593
+F1 Score: 0.64
+
+same as above with POS features added
+
+with POS frequency features added:
+Accuracy: 0.583941605839
+Precision: 0.608695652174
+Recall: 0.583333333333
+F1 Score: 0.595744680851
+
+without POS or POS frequency, with mine/thine:
+Accuracy: 0.620437956204
+Precision: 0.724637681159
+Recall: 0.602409638554
+F1 Score: 0.657894736842
