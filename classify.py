@@ -324,7 +324,7 @@ def thine_features(proc_data, label):
     return features
 
 
-def extract_features(proc_data, label=False, algorithm='MaxEnt'):
+def extract_features(proc_data, label, algorithm):
     features = common_bigram_features(proc_data, label)
     pos_trigram_feat = pos_trigram_features(proc_data, label)
     len_feat = len_features(proc_data, label)
@@ -371,12 +371,12 @@ def get_training_set(algorithm):
     train_proc_data = pickle.load(train_pickled)
     train_pickled.close()
    
-    featureset = extract_features(train_proc_data, label=True,
-        algorithm='MaxEnt')
+    featureset = extract_features(train_proc_data, True,
+        algorithm)
 
     return featureset
 
-def get_dev_set():
+def get_dev_set(algorithm):
     """ Returns a tuple whose first element is the unlabeled list of feature
     dicts ready for classification and whose second element is the list of
     gold labels. """
@@ -384,7 +384,7 @@ def get_dev_set():
     dev_proc_data = pickle.load(dev_pickled)
     dev_pickled.close()
 
-    featureset = extract_features(dev_proc_data)
+    featureset = extract_features(dev_proc_data, False, algorithm)
     labels = extract_labels(dev_proc_data)
     print labels
     return (featureset, labels)
@@ -416,7 +416,7 @@ def classify():
         classifier.train(training_set)
 
 
-    dev_set = get_dev_set()
+    dev_set = get_dev_set(algo_choice)
     labels = classifier.batch_classify(dev_set[0])
     print labels
 
