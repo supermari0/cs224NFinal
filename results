@@ -193,3 +193,10 @@ Accuracy: 0.620437956204
 Precision: 0.724637681159
 Recall: 0.602409638554
 F1 Score: 0.657894736842
+
+same as above but with quadratically combined features - note higher f1 than
+best MaxEnt:
+Accuracy: 0.642335766423
+Precision: 0.768115942029
+Recall: 0.616279069767
+F1 Score: 0.683870967742

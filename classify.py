@@ -5,6 +5,7 @@ from optparse import OptionParser
 import pickle
 import sklearn
 from sklearn.svm import LinearSVC
+import string
 
 TRAIN_DATA_FILE = 'data/proc_train'
 DEV_DATA_FILE = 'data/proc_dev'
@@ -348,6 +349,8 @@ def extract_features(proc_data, label, algorithm):
                 features[i][0].update(token_feat[i][0])
                 features[i][0].update(mine_feat[i][0])
                 features[i][0].update(thine_feat[i][0])
+                #features[i] = (combine_svm_bin_features(features[i][0]),
+                #        features[i][1])
         else:
             features[i].update(pos_trigram_feat[i])
             features[i].update(len_feat[i])
@@ -358,7 +361,41 @@ def extract_features(proc_data, label, algorithm):
                 features[i].update(token_feat[i])
                 features[i].update(mine_feat[i])
                 features[i].update(thine_feat[i])
+                #features[i] = combine_svm_bin_features(features[i])
     return features
+
+def binary_feature(feature_val_pair):
+    """ Boolean function returning true iff the feature is a binary feature
+    (one which only accepts values of 0 or 1). """
+    feat_name = feature_val_pair[0]
+
+    return ((feat_name != 'speech_len') and (feat_name != 'n_male_names') and
+            (feat_name != 'n_female_names') and (feat_name != 'n_mine') and
+            (feat_name != 'n_thine'))
+
+
+def combine_svm_bin_features(features):
+    """ Combines binary features quadratically for use in a SVM. For example,
+    if a speech contains the bigram "the hat" and the trigram "the hat is", a
+    new feature representing both of those features will be set to 1. If the
+    speech contains "the hat" but not "the hat is", then the new feature will
+    be set to 0. """
+    feature_list = features.items()
+
+    new_features = []
+    for i in range(len(feature_list)):
+        original_feature = feature_list[i]
+        if binary_feature(original_feature):
+            for j in range(i+1, len(feature_list)):
+                feature_to_combine = feature_list[j]
+                if binary_feature(feature_to_combine):
+                    if original_feature[1] == 1 and feature_to_combine[1] == 1:
+                        new_feat = (original_feature[0] + '/' +
+                                feature_to_combine[0], 1)
+                        new_features.append(new_feat)
+
+    feature_list = feature_list + new_features
+    return dict(feature_list)
 
 def extract_labels(proc_data):
     labels = []

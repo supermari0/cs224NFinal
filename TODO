@@ -7,12 +7,15 @@ x different algorithms, cross-validation
 X figure out why Naive Bayes and SVM suck with this feature set, try with
   different feature sets
 
-- another feature to try -- "I" or "me" in the same sentence as male or female
+x nahhh - another feature to try -- "I" or "me" in the same sentence as male or female
   name
-- try combining svm features (maybe just binary features, read more about this)
+
+x try combining svm features (maybe just binary features, read more about this)
+    - takes too long -- over 10 mins
+
 - add cross-validation
 
-^^ above by EOD Thursday
+^^ above by EOD Friday
 
 - get results for how humans perform at classification; inspired by 
   http://thekeesh.com/cs224n/final_writeup.pdf
