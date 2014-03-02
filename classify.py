@@ -403,10 +403,28 @@ def extract_labels(proc_data):
         labels += speech_tuple[1]
     return labels
 
+
+def get_all_data():
+    train_pickled = open(TRAIN_DATA_FILE, 'rb')
+    train_proc_data = pickle.load(train_pickled)
+    train_pickled.close()
+
+    dev_pickled = open(DEV_DATA_FILE, 'rb')
+    dev_proc_data = pickle.load(dev_pickled)
+    dev_pickled.close()
+
+    test_pickled = open(TEST_DATA_FILE, 'rb')
+    test_proc_data = pickle.load(test_pickled)
+    test_pickled.close()
+
+    return train_proc_data + dev_proc_data + test_proc_data
+
 def get_training_set(algorithm):
     train_pickled = open(TRAIN_DATA_FILE, 'rb')
     train_proc_data = pickle.load(train_pickled)
     train_pickled.close()
+
+    print(len(train_proc_data))
    
     featureset = extract_features(train_proc_data, True,
         algorithm)
@@ -421,22 +439,67 @@ def get_dev_set(algorithm):
     dev_proc_data = pickle.load(dev_pickled)
     dev_pickled.close()
 
+    print(len(dev_proc_data))
+
     featureset = extract_features(dev_proc_data, False, algorithm)
     labels = extract_labels(dev_proc_data)
     print labels
     return (featureset, labels)
 
+def get_k_datasets(proc_data, k, algorithm):
+    """ Returns the kth training and test  for 5-fold cross-validation. k
+    ranges from 0 to 4. Training set is first member of list, test set is
+    second member. Test set is a tuple whose first member is the unlabeled data
+    ready for classification and whose second member is the list of gold
+    labels. """
+    start_index = k * (len(proc_data) / 5)
 
-def classify():
-    parser = OptionParser()
-    parser.add_option('-a', '--algorithm', dest='algorithm', help='sets' +
-        ' algorithm to one of NaiveBayes, SVM, or MaxEnt. defaults to MaxEnt')
-    (options, args) = parser.parse_args()
+    if k == 4:
+        train_data = proc_data[start_index:]
+        test_data = proc_data[0:start_index]
+    else:
+        end_index = (k + 1) * (len(proc_data) / 5)
+        train_data = proc_data[start_index:end_index]
+        test_data = proc_data[0:start_index] + proc_data[end_index:]
 
-    algo_choice = options.algorithm
+    train_featureset = extract_features(train_data, True, algorithm)
+    test_featureset = extract_features(test_data, False, algorithm)
+    test_labels = extract_labels(test_data)
+     
+    return [train_featureset, (test_featureset, test_labels)]
 
-    training_set = get_training_set(algo_choice)
-    
+def results_from_labels(hypothesis, gold):
+    """ Calculates results from classifier hypothesis and gold labels. """
+
+    correct = 0
+    true_male = 0
+    true_female = 0
+    false_male = 0
+    false_female = 0
+
+    for i in range(len(hypothesis)):
+        if hypothesis[i] == gold[i]:
+            correct += 1
+            if gold[i] == 'M':
+                true_male += 1
+            else:
+                true_female += 1
+        else:
+            if gold[i] == 'M':
+                false_female += 1
+            else:
+                false_male += 1
+
+    accuracy = float(correct)/len(gold)
+    precision = float(true_male) / (true_male + false_male)
+    recall = float(true_male) / (true_male + false_female)
+    f1_score = 2 * ( (precision * recall) / (precision + recall))
+
+    return [accuracy, precision, recall, f1_score]
+
+
+def classify_results(training_set, test_set, test_labels, algo_choice):
+
     if algo_choice is None or algo_choice == 'MaxEnt':
         print('Training classifier with MaxEnt algorithm...')
         # Set algorithm to GIS because of bug in scipy (missing maxentropy module).
@@ -452,41 +515,51 @@ def classify():
         classifier = nltk.classify.SklearnClassifier(LinearSVC())
         classifier.train(training_set)
 
+    classify_labels = classifier.batch_classify(test_set)
 
-    dev_set = get_dev_set(algo_choice)
-    labels = classifier.batch_classify(dev_set[0])
-    print labels
+    return results_from_labels(classify_labels, test_labels)
 
-    # Get result statistics
+def classify():
+    parser = OptionParser()
+    parser.add_option('-a', '--algorithm', dest='algorithm', help='sets' +
+        ' algorithm to one of NaiveBayes, SVM, or MaxEnt. defaults to MaxEnt')
+    (options, args) = parser.parse_args()
 
-    correct = 0
-    true_male = 0
-    true_female = 0
-    false_male = 0
-    false_female = 0
+    algo_choice = options.algorithm
 
-    for i in range(len(labels)):
-        if labels[i] == dev_set[1][i]:
-            correct += 1
-            if labels[i] == 'M':
-                true_male += 1
-            else:
-                true_female += 1
-        else:
-            if labels[i] == 'M':
-                false_female += 1
-            else:
-                false_male += 1
+    #training_set = get_training_set(algo_choice)
 
-    accuracy = float(correct)/len(labels)
-    precision = float(true_male) / (true_male + false_male)
-    recall = float(true_male) / (true_male + false_female)
-    f1_score = 2 * ( (precision * recall) / (precision + recall))
+    proc_data = get_all_data()
+
+    k_results = []
+
+    for i in range(5):
+        print('Calculating ' + str(i) + ' fold...')
+        datasets = get_k_datasets(proc_data, i, algo_choice)
+        training_set = datasets[0]
+        test_set = datasets[1][0]
+        test_labels = datasets[1][1]
+        results = classify_results(training_set, test_set, test_labels,
+                algo_choice)
+        k_results.append(results)
+
+    accuracy = float(sum(result[0] for result in k_results)) / len(k_results)
+    precision = float(sum(result[1] for result in k_results)) / len(k_results)
+    recall = float(sum(result[2] for result in k_results)) / len(k_results)
+    f1_score = float(sum(result[3] for result in k_results)) / len(k_results)
 
     print('Accuracy: ' + str(accuracy))
     print('Precision: ' + str(precision))
     print('Recall: ' + str(recall))
     print('F1 Score: ' + str(f1_score))
+
+    ##dev_set = get_dev_set(algo_choice)
+    #tuplelabels = classifier.batch_classify(dev_set[0])
+    #print labels
+
+    ## Get result statistics
+
+
 
 if __name__ == '__main__':
     classify()
