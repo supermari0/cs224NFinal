@@ -200,3 +200,17 @@ Accuracy: 0.642335766423
 Precision: 0.768115942029
 Recall: 0.616279069767
 F1 Score: 0.683870967742
+
+2-fold SVM:
+Accuracy: 0.69042465471
+Precision: 0.690418679549
+Recall: 0.697551020408
+F1 Score: 0.692556634304
+
+2-fold MaxEnt:
+Accuracy: 0.629200164914
+Precision: 0.635606060606
+Recall: 0.65693877551
+F1 Score: 0.641713839547
+
+** why does SVM seem to handle more data better?

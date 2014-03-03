@@ -13,17 +13,15 @@ x nahhh - another feature to try -- "I" or "me" in the same sentence as male or 
 x try combining svm features (maybe just binary features, read more about this)
     - takes too long -- over 10 mins
 
-- add cross-validation
--- separate 5fold, test, and dev options
+X add cross-validation
+x separate 5fold, test, and dev options. make kfold have arbitrary k
 
-^^ above by EOD Friday
 
+- evaluate kfold results with different k/algorithms, record
+- finish up inline documentation for *all* files
 - get results for how humans perform at classification; inspired by 
   http://thekeesh.com/cs224n/final_writeup.pdf
-
-- later: merge features into one-pass?
-
-- fix, comment better token_stats.py - call it vocab_gen or something
+- start writing paper
 
 - after done with Shakespeare, try to eval author gender.
 - after that, try to classify modern texts; then, train on modern texts and

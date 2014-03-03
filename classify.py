@@ -403,7 +403,6 @@ def extract_labels(proc_data):
         labels += speech_tuple[1]
     return labels
 
-
 def get_all_data():
     train_pickled = open(TRAIN_DATA_FILE, 'rb')
     train_proc_data = pickle.load(train_pickled)
@@ -424,8 +423,6 @@ def get_training_set(algorithm):
     train_proc_data = pickle.load(train_pickled)
     train_pickled.close()
 
-    print(len(train_proc_data))
-   
     featureset = extract_features(train_proc_data, True,
         algorithm)
 
@@ -439,26 +436,37 @@ def get_dev_set(algorithm):
     dev_proc_data = pickle.load(dev_pickled)
     dev_pickled.close()
 
-    print(len(dev_proc_data))
-
     featureset = extract_features(dev_proc_data, False, algorithm)
     labels = extract_labels(dev_proc_data)
-    print labels
+
     return (featureset, labels)
 
-def get_k_datasets(proc_data, k, algorithm):
+def get_test_set(algorithm):
+    """ Returns a tuple whose first element is the unlabeled list of feature
+    dicts ready for classification and whose second element is the list of
+    gold labels. """
+    test_pickled = open(TEST_DATA_FILE, 'rb')
+    test_proc_data = pickle.load(dev_pickled)
+    test_pickled.close()
+
+    featureset = extract_features(test_proc_data, False, algorithm)
+    labels = extract_labels(test_proc_data)
+
+    return (featureset, labels)
+
+def get_k_datasets(proc_data, k, algorithm, kfold):
     """ Returns the kth training and test  for 5-fold cross-validation. k
     ranges from 0 to 4. Training set is first member of list, test set is
     second member. Test set is a tuple whose first member is the unlabeled data
     ready for classification and whose second member is the list of gold
     labels. """
-    start_index = k * (len(proc_data) / 5)
+    start_index = k * (len(proc_data) / kfold)
 
-    if k == 4:
+    if k == kfold - 1:
         train_data = proc_data[start_index:]
         test_data = proc_data[0:start_index]
     else:
-        end_index = (k + 1) * (len(proc_data) / 5)
+        end_index = (k + 1) * (len(proc_data) / kfold)
         train_data = proc_data[start_index:end_index]
         test_data = proc_data[0:start_index] + proc_data[end_index:]
 
@@ -519,47 +527,91 @@ def classify_results(training_set, test_set, test_labels, algo_choice):
 
     return results_from_labels(classify_labels, test_labels)
 
-def classify():
-    parser = OptionParser()
-    parser.add_option('-a', '--algorithm', dest='algorithm', help='sets' +
-        ' algorithm to one of NaiveBayes, SVM, or MaxEnt. defaults to MaxEnt')
-    (options, args) = parser.parse_args()
-
-    algo_choice = options.algorithm
-
-    #training_set = get_training_set(algo_choice)
-
-    proc_data = get_all_data()
-
-    k_results = []
-
-    for i in range(5):
-        print('Calculating ' + str(i) + ' fold...')
-        datasets = get_k_datasets(proc_data, i, algo_choice)
-        training_set = datasets[0]
-        test_set = datasets[1][0]
-        test_labels = datasets[1][1]
-        results = classify_results(training_set, test_set, test_labels,
-                algo_choice)
-        k_results.append(results)
-
-    accuracy = float(sum(result[0] for result in k_results)) / len(k_results)
-    precision = float(sum(result[1] for result in k_results)) / len(k_results)
-    recall = float(sum(result[2] for result in k_results)) / len(k_results)
-    f1_score = float(sum(result[3] for result in k_results)) / len(k_results)
+def print_results(results, test_mode):
+    if test_mode == 'kfold':
+        accuracy = float(sum(result[0] for result in results)) / len(results)
+        precision = float(sum(result[1] for result in results)) / len(results)
+        recall = float(sum(result[2] for result in results)) / len(results)
+        f1_score = float(sum(result[3] for result in results)) / len(results)
+    else:
+        accuracy = results[0]
+        precision = results[1]
+        recall = results[2]
+        f1_score = results[3]
 
     print('Accuracy: ' + str(accuracy))
     print('Precision: ' + str(precision))
     print('Recall: ' + str(recall))
     print('F1 Score: ' + str(f1_score))
 
-    ##dev_set = get_dev_set(algo_choice)
-    #tuplelabels = classifier.batch_classify(dev_set[0])
-    #print labels
 
-    ## Get result statistics
+def classify():
+    parser = OptionParser()
+    parser.add_option('-a', '--algorithm', dest='algorithm', help='sets' +
+        ' algorithm to one of NaiveBayes, SVM, or MaxEnt. defaults to MaxEnt')
+    parser.add_option('-t', '--test', dest='test', help='sets test mode '
+            + 'to one of kfold, dev, or test. kfold parameter must be'
+            + ' specified if kfold mode is selected. defaults to test')
+    parser.add_option('-k', '--kfold', dest='kfold', help='sets number of '
+            + 'folds for k-fold cross validation. defaults to 5 if kfold '
+            + 'selected.')
+            
+    (options, args) = parser.parse_args()
 
+    algo_choice = options.algorithm
 
+    #training_set = get_training_set(algo_choice)
+
+    if options.test is None or options.test == 'test':
+        print('Classifying test set...')
+        training_set = get_training_set(algo_choice)
+        test_data = get_test_set(algo_choice)
+
+        test_set = test_data[0]
+        test_labels = test_data[1]
+
+        results = classify_results(training_set, test_set, test_labels,
+                algo_choice)
+
+    elif options.test == 'dev':
+        print('Classifying dev set...')
+        training_set = get_training_set(algo_choice)
+        test_data = get_dev_set(algo_choice)
+
+        test_set = test_data[0]
+        test_labels = test_data[1]
+
+        results = classify_results(training_set, test_set, test_labels,
+                algo_choice)
+
+    elif options.test == 'kfold':
+        if options.kfold is None:
+            kfold = 5
+        else:
+            try:
+                kfold = int(options.kfold)
+            except ValueError:
+                print('Invalid integer for kfold. Defaulting to 5 folds.')
+                kfold = 5
+
+        print('Classifying entire dataset with ' + str(kfold) + '-fold cross-validation...')
+        proc_data = get_all_data()
+
+        k_results = []
+
+        for i in range(kfold):
+            print('Calculating ' + str(i) + ' fold...')
+            datasets = get_k_datasets(proc_data, i, algo_choice, kfold)
+            training_set = datasets[0]
+            test_set = datasets[1][0]
+            test_labels = datasets[1][1]
+            results = classify_results(training_set, test_set, test_labels,
+                    algo_choice)
+            k_results.append(results)
+
+        results = k_results
+
+    print_results(results, options.test)
 
 if __name__ == '__main__':
     classify()
