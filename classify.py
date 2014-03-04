@@ -25,6 +25,9 @@ FEMALE_NAMES_FILE = 'data/female_names.txt'
 N_ITERATIONS = 50
 
 def len_features(proc_data, label):
+    """ This feature puts a speech into 1 of 6 buckets depending on the speech
+    length. Discretization of this feature appears to work better than simply
+    using the raw length as a feature. """
     features = []
 
     for speech_tuple in proc_data:
@@ -54,6 +57,9 @@ def len_features(proc_data, label):
     return features
 
 def pos_bigram_features(proc_data, label):
+    """ Binary features for part-of-speech bigrams. Only finds bigrams that
+    were precomputed from the training data (data/proc_train). This means that
+    if the training data changes, the bigrams looked for will be the same. """
     pos_bigrams_pickled = open(POS_BIGRAMS_FILE, 'rb')
     pos_bigrams_set = pickle.load(pos_bigrams_pickled)
     pos_bigrams_pickled.close()
@@ -76,6 +82,7 @@ def pos_bigram_features(proc_data, label):
     return features
 
 def pos_bigram_feature_dict(pos_bigrams_dict, token_tuples):
+    """ Helper function for pos_bigram_features. """
     for i in range(1, len(token_tuples)):
         pos = token_tuples[i][1]
         prev_pos = token_tuples[i-1][1]
@@ -85,6 +92,9 @@ def pos_bigram_feature_dict(pos_bigrams_dict, token_tuples):
     return pos_bigrams_dict
 
 def pos_trigram_features(proc_data, label):
+    """ Binary features for part-of-speech trigrams. Only finds trigrams that
+    were precomputed from the training data (data/proc_train). This means that
+    if the training data changes, the trigrams looked for will be the same. """
     pos_trigrams_pickled = open(POS_TRIGRAMS_FILE, 'rb')
     pos_trigrams_set = pickle.load(pos_trigrams_pickled)
     pos_trigrams_pickled.close()
@@ -107,6 +117,7 @@ def pos_trigram_features(proc_data, label):
     return features
 
 def pos_trigram_feature_dict(pos_trigrams_dict, token_tuples):
+    """ Helper function for pos_trigram_features. """
     for i in range(2, len(token_tuples)):
         pos = token_tuples[i][1]
         prev_pos = token_tuples[i-1][1]
@@ -117,6 +128,8 @@ def pos_trigram_feature_dict(pos_trigrams_dict, token_tuples):
     return pos_trigrams_dict
 
 def common_bigram_features(proc_data, label):
+    """ Binary features for bigrams. The bigrams searched for consist of the
+    1500 most common bigrams in data/proc_train. """
     common_bigrams_pickled = open(COMMON_BIGRAMS_FILE, 'rb')
     common_bigrams_set = pickle.load(common_bigrams_pickled)
     common_bigrams_pickled.close()
@@ -139,6 +152,7 @@ def common_bigram_features(proc_data, label):
     return features
 
 def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
+    """ Helper function for common_bigram_features. """
     for i in range(1, len(token_tuples)):
         token = token_tuples[i][0]
         prev_token = token_tuples[i-1][0]
@@ -149,6 +163,8 @@ def common_bigram_feature_dict(common_bigrams_dict, token_tuples):
     return common_bigrams_dict
 
 def common_trigram_features(proc_data, label):
+    """ Binary features for trigrams. The trigrams searched for consist of the
+    750 most common trigrams in data/proc_train. """
     common_trigrams_pickled = open(COMMON_TRIGRAMS_FILE, 'rb')
     common_trigrams_set = pickle.load(common_trigrams_pickled)
     common_trigrams_pickled.close()
@@ -171,6 +187,7 @@ def common_trigram_features(proc_data, label):
     return features
 
 def common_trigram_feature_dict(common_trigrams_dict, token_tuples):
+    """ Helper function for common_trigram_features. """
     for i in range(2, len(token_tuples)):
         token = token_tuples[i][0]
         prev_token = token_tuples[i-1][0]
@@ -182,6 +199,9 @@ def common_trigram_feature_dict(common_trigrams_dict, token_tuples):
     return common_trigrams_dict
 
 def male_name_features(proc_data, label):
+    """ Binary features for whether or not a speech contains a given male
+    Shakespeare name. The names were taken from a Shakespeare name list at
+    http://www.namenerds.com/uucn/shakes.html. """
     features = []
 
     male_names_set = set()
@@ -210,6 +230,9 @@ def male_name_features(proc_data, label):
     return features
 
 def female_name_features(proc_data, label):
+    """ Binary features for whether or not a speech contains a given female
+    Shakespeare name. The names were taken from a Shakespeare name list at
+    http://www.namenerds.com/uucn/shakes.html. """
     features = []
 
     female_names_set = set()
@@ -281,6 +304,9 @@ def common_token_features(proc_data, label):
     return features
 
 def mine_features(proc_data, label):
+    """ A feature for the number of times the speaker uses the word 'mine'. The
+    idea behind this feature was that men and women might differ in their use
+    of possessives in Shakespeare. """
     features = []
 
     for speech_tuple in proc_data:
@@ -303,6 +329,9 @@ def mine_features(proc_data, label):
     return features
 
 def thine_features(proc_data, label):
+    """ A feature for the number of times the speaker uses the word 'thine'. The
+    idea behind this feature was that men and women might differ in their use
+    of possessives in Shakespeare. """
     features = []
 
     for speech_tuple in proc_data:
@@ -326,6 +355,10 @@ def thine_features(proc_data, label):
 
 
 def extract_features(proc_data, label, algorithm):
+    """ Returns an array of feature dictionaries from proc_data. If the data is
+    labeled as indicated by the label boolean, the data will be labeled.
+    algorithm adjusts the features used based on the selected algorithm (SVM
+    works better with more features). """
     features = common_bigram_features(proc_data, label)
     pos_trigram_feat = pos_trigram_features(proc_data, label)
     len_feat = len_features(proc_data, label)
@@ -398,12 +431,15 @@ def combine_svm_bin_features(features):
     return dict(feature_list)
 
 def extract_labels(proc_data):
+    """ Returns an array of labels from the labeled data. 'M' and 'F' are the
+    only valid labels. """
     labels = []
     for speech_tuple in proc_data:
         labels += speech_tuple[1]
     return labels
 
 def get_all_data():
+    """ Returns all the processed data concatenated together. """
     train_pickled = open(TRAIN_DATA_FILE, 'rb')
     train_proc_data = pickle.load(train_pickled)
     train_pickled.close()
@@ -419,6 +455,8 @@ def get_all_data():
     return train_proc_data + dev_proc_data + test_proc_data
 
 def get_training_set(algorithm):
+    """ Extracts features and returns the training set ready to be fed into a
+    given algorithm. """
     train_pickled = open(TRAIN_DATA_FILE, 'rb')
     train_proc_data = pickle.load(train_pickled)
     train_pickled.close()
@@ -455,8 +493,8 @@ def get_test_set(algorithm):
     return (featureset, labels)
 
 def get_k_datasets(proc_data, k, algorithm, kfold):
-    """ Returns the kth training and test  for 5-fold cross-validation. k
-    ranges from 0 to 4. Training set is first member of list, test set is
+    """ Returns the kth training and test sets for k-fold cross-validation. k
+    is 0-indexed. Training set is first member of list, test set is
     second member. Test set is a tuple whose first member is the unlabeled data
     ready for classification and whose second member is the list of gold
     labels. """
@@ -507,7 +545,7 @@ def results_from_labels(hypothesis, gold):
 
 
 def classify_results(training_set, test_set, test_labels, algo_choice):
-
+    """ Trains the chosen algorithm and returns the array of results. """
     if algo_choice is None or algo_choice == 'MaxEnt':
         print('Training classifier with MaxEnt algorithm...')
         # Set algorithm to GIS because of bug in scipy (missing maxentropy module).
@@ -528,6 +566,8 @@ def classify_results(training_set, test_set, test_labels, algo_choice):
     return results_from_labels(classify_labels, test_labels)
 
 def print_results(results, test_mode):
+    """ Prints the result stats from classification. If we are performing
+    k-fold cross-validation, we average the statistics over the k runs. """
     if test_mode == 'kfold':
         accuracy = float(sum(result[0] for result in results)) / len(results)
         precision = float(sum(result[1] for result in results)) / len(results)
@@ -546,6 +586,8 @@ def print_results(results, test_mode):
 
 
 def classify():
+    """ Main method. """
+
     parser = OptionParser()
     parser.add_option('-a', '--algorithm', dest='algorithm', help='sets' +
         ' algorithm to one of NaiveBayes, SVM, or MaxEnt. defaults to MaxEnt')
@@ -559,8 +601,6 @@ def classify():
     (options, args) = parser.parse_args()
 
     algo_choice = options.algorithm
-
-    #training_set = get_training_set(algo_choice)
 
     if options.test is None or options.test == 'test':
         print('Classifying test set...')
