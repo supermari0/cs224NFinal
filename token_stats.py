@@ -1,3 +1,7 @@
+""" This program collects and outputs several important pieces of data for use
+by the classifier, such as the top 1.5K bigrams. Much of this file is commented
+out since additional data were added incrementally, and we didn't want to
+overwrite previously processed data unnecessarily. """
 from collections import defaultdict
 import operator
 import pickle

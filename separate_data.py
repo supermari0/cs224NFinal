@@ -1,3 +1,5 @@
+""" This program divides the speeches into a training, development, and test
+set without performing any additional processing of the data. """
 import random
 
 if __name__ == '__main__':

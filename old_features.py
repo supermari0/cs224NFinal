@@ -1,3 +1,5 @@
+""" This file contains features that weren't used in the final iteration of the
+project."""
 def pos_features(proc_data, label):
     # TODO add backoff, pos ngrams. use indicator vars instead of stats.
     # TODO parse and put POS from train including 'OTHER' in file to make this job easier

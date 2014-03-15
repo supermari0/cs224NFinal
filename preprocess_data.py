@@ -1,3 +1,6 @@
+""" This file tokenizes, tags, and stems already-selected training,
+development, and test speeches. """
+
 import nltk
 import pickle
 
