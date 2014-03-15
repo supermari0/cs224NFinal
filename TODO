@@ -18,8 +18,8 @@ x separate 5fold, test, and dev options. make kfold have arbitrary k
 
 
 X finish up inline documentation for *all* files
-- add option for quadratic computation with SVM
 - evaluate kfold results with different k/algorithms, record
+- add option for quadratic computation with SVM
 - get results for how humans perform at classification; inspired by 
   http://thekeesh.com/cs224n/final_writeup.pdf
 - start writing paper
