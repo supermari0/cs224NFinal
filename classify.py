@@ -1,3 +1,6 @@
+""" Main module for CS224N final project. This is a classifier for the works of
+William Shakespeare which attempts to determine whether a character's gender is
+male or female. """
 import collections
 import math
 import nltk
